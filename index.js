@@ -9,7 +9,12 @@ function timeout(ms) {
 
 (async () => {
   ////////////// Démarage et recherche de l'url //////////////
-  const browser = await puppeteer.launch();
+  const browser = await puppeteer.launch(); /*{
+      headless: false, // The browser is visible
+      ignoreHTTPSErrors: true,
+      args: [`--window-size=2000,1080`], // new option
+      defaultViewport: null
+  }*/
   const page = await browser.newPage();
   await page.goto  (url);
   await page.screenshot({ path: 'screen.png' });
@@ -18,7 +23,7 @@ function timeout(ms) {
   ////////////// Recherche de l'emploi du temps //////////////
   // const frame = page.frames().find(frame => frame.url() === url);
   let input = await page.waitForSelector(sel);
-  await timeout(100); // Sans ça ca marche une fois sur deux
+  await timeout(100); // Sans ça ça marche une fois sur deux
 
   await page.$eval(sel, input => input.setAttribute('value', '21L3-INF'))
   // await input.type('21L3-INF'); // await page.keyboard.type('21L3-INF');
@@ -35,7 +40,7 @@ function timeout(ms) {
     let i = 0;
     let element;
     const matieres = [];
-    const nbHour = (21.5-8);
+    const nbHour = (21.4-8);
     const {clientWidth: maxWidth, clientHeight: maxHeight} = document.getElementById('Planning');
     ////////////// Traitement de texte //////////////
     const getGroup = (text) => {
@@ -55,7 +60,10 @@ function timeout(ms) {
 
     ////////////// Jour et Horaire //////////////
     const hpw = (nbHour/maxWidth); // heure par taille * 10
-    const toHour = (w) => Math.round(w * hpw * 10)/10;
+    const toHour = w => {
+      w = Math.round(w * hpw * 10);
+      return w / 10;
+    };
 
     // Tant que l'on a des matières à traiter
     while (element = document.getElementById('inner'+i)) {
