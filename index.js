@@ -35,6 +35,8 @@ function timeout(ms) {
     let i = 0;
     let element;
     const matieres = [];
+    const nbHour = (21.5-8);
+    const {clientWidth: maxWidth, clientHeight: maxHeight} = document.getElementById('Planning');
     ////////////// Traitement de texte //////////////
     const getGroup = (text) => {
       let group;
@@ -52,7 +54,8 @@ function timeout(ms) {
       ).replace(/ALB/g, '').trim();
 
     ////////////// Jour et Horaire //////////////
-    const toHour = (width) => Math.round((width/73)*10)/10;
+    const hpw = (nbHour/maxWidth); // heure par taille * 10
+    const toHour = (w) => Math.round(w * hpw * 10)/10;
 
     // Tant que l'on a des matières à traiter
     while (element = document.getElementById('inner'+i)) {
@@ -65,8 +68,8 @@ function timeout(ms) {
         titre: element.firstChild.innerHTML,
         //salle: getSalle(text),
         //groupe: getGroup(text),
-        duree: div.clientWidth,
-        horaire: parent.offsetLeft,
+        duree: toHour(div.clientWidth),
+        horaire: toHour(parent.offsetLeft) + 8,
         jour: parent.offsetTop,
       });
 
