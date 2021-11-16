@@ -62,21 +62,22 @@ function timeout(ms) {
       ).replace(/ALB/g, '').trim();
 
     ////////////// Jour et Horaire //////////////
-    const toHour = width => {
+    const toHour = (width, hourOffset=0) => {
       const h = width * (nbHour/maxWidth);
-      let hours = Math.round(h);
+      let hours = Math.trunc(h);
       let m = (h-hours) * 100;
 
-      let closestDif = m,
-        minutes = 0;
+      let closestDif = m, minutes = 0;
       for (const norm of [25, 50, 75]) {
         const dif = Math.abs(norm - m);
         if (dif < closestDif) {
           closestDif = dif;
-          minutes = norm * 0.6
+          minutes = norm * 0.6;
         }
       }
-      return new Date(0).setMinutes(minutes).setHours(hours)//`${hours}:${minutes}:00`;
+      const d = new Date(0);
+      d.setHours(hours + hourOffset, minutes, 0);
+      return d.toLocaleTimeString();
     };
 
     // Tant que l'on a des matières à traiter
@@ -91,7 +92,7 @@ function timeout(ms) {
         //salle: getSalle(text),
         //groupe: getGroup(text),
         duree: toHour(div.clientWidth),
-        horaire: toHour(parent.offsetLeft) + 8,
+        horaire: toHour(parent.offsetLeft, 8),
         jour: parent.offsetTop,
       });
 
