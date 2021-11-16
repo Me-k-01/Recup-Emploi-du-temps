@@ -7,7 +7,7 @@ const sel = '#x-auto-99-input';
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-const con = mysql.createConnection(require('creditential.json'));
+const con = mysql.createConnection(require('./creditential.json'));
 
 (async () => {
   ////////////// Démarage et recherche de l'url //////////////
@@ -46,7 +46,7 @@ const con = mysql.createConnection(require('creditential.json'));
     const {clientWidth: maxWidth, clientHeight: maxHeight} = document.getElementById('Planning');
     ////////////// Traitement de texte //////////////
     const getGroup = (text) => {
-      let group;
+      let group = null;
       const i = text.indexOf('Groupe-');
       if (i >= 0) {
         group = text.charAt(i+7)
@@ -88,15 +88,15 @@ const con = mysql.createConnection(require('creditential.json'));
       const text = element.innerHTML;
       const div = document.getElementById('div'+i);
       const parent = div.parentElement;
-      matieres.push({
-        filiere,
-        titre: element.firstChild.innerHTML,
-        salle: getSalle(text),
-        groupe: getGroup(text),
-        duree: toHour(div.clientWidth),
-        horaire: toHour(parent.offsetLeft, 8),
-        jour: toDay(parent.offsetTop),
-      });
+      matieres.push([
+        filiere, // Filiere
+        element.firstChild.innerHTML, // Titre
+        toDay(parent.offsetTop), // Jour
+        toHour(parent.offsetLeft, 8), // Horaire
+        toHour(div.clientWidth), // Duree
+        getSalle(text), // Salle
+        getGroup(text), // Groupe
+      ]);
 
       i++;
     }
@@ -106,28 +106,17 @@ const con = mysql.createConnection(require('creditential.json'));
 
   con.connect(function(err) {
     if (err) throw err;
+    console.log('Connecté a la base de données');
     ////////////// Effacement de toute les valeurs //////////////
     con.query('TRUNCATE Schedule', function (err, res) {
       if (err) throw err;
       console.log('Données effacées');
 
-      // for (const m of matieres) {
-      //   let insertStr = '';
-      //   let valueStr = '';
-      //   const matArr = Object.entries(m);
-      //   for (var i = 0; i < matArr.length; i++) {
-      //     const [k, v] = matArr[i];
-      //     insertStr += k;
-      //     valueStr += v;
-      //     if (i != matArr.length-1) {
-      //       insertStr += ',';
-      //       valueStr += ',';
-      //     }
-      //   }
-      //   con.query(`INSERT INTO Schedule (${insertStr}) VALUES (${valueStr})`, function (err, res) {
-      //     if (err) throw err;
-      //   });
-      // }
+      var sql = "INSERT INTO Schedule (filiere, titre, jour, horaire, duree, salle, groupe) VALUES ?";
+      con.query(sql, [matieres], function (err, res) {
+        if (err) throw err;
+        console.log("Nombre de matieres inséré: " + res.affectedRows);
+      });
     });
   });
 
