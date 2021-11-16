@@ -43,8 +43,12 @@ function timeout(ms) {
       const text = element.innerHTML;
       let groupe;
       const groupIndex = text.indexOf('Groupe-');
-      if (groupIndex >= 0)
-        groupe = text.charAt(groupIndex+8)
+      if (groupIndex >= 0){
+        groupe = text.charAt(groupIndex+7)
+        if (groupe == '0') {
+          groupe = text.charAt(groupIndex+8)
+        }
+      }
 
 
       const salle = text.substring(text.indexOf('<br>ALB') + 7, text.lastIndexOf('<br>'))
