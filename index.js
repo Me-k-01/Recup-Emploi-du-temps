@@ -6,7 +6,7 @@ const sel = '#x-auto-99-input';
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-
+please
 
 (async () => {
   ////////////// Démarage et recherche de l'url //////////////
@@ -32,14 +32,13 @@ function timeout(ms) {
 
 
   ////////////// Récupération de l'emploi du temps //////////////
-  const matieres = await page.evaluate(() => {
+  const matieres = await page.evaluate((filiere) => {
     let i = 0;
     let element;
     const matieres = [];
 
     // Tant que l'on a des matières à traiter
     while (element = document.getElementById('inner'+i)) {
-      // TODO: Ameliorer ca
       const text = element.innerHTML;
       let groupe;
       const groupIndex = text.indexOf('Groupe-');
@@ -57,12 +56,12 @@ function timeout(ms) {
       // const salle = element.substring(index, element.lastIndexOf('<br>'));
       matieres.push({
         titre: element.firstChild.innerHTML,
-        // filiere: '21L3-INF',
+        salle,
+        groupe,
+        filiere,
         // jour,
         // horaire,
         // duree,
-        salle,
-        groupe
       })
     // let prevParent;
       // const parent = element.parentNode;
@@ -78,7 +77,7 @@ function timeout(ms) {
       i++;
     }
     return matieres;
-  });
+  }, '21L3-INF');
   console.log(matieres);
   // clearInterval(intervalID);
   await browser.close();
