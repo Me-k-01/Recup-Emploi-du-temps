@@ -6,7 +6,6 @@ const sel = '#x-auto-99-input';
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
-please
 
 (async () => {
   ////////////// Démarage et recherche de l'url //////////////
@@ -36,43 +35,40 @@ please
     let i = 0;
     let element;
     const matieres = [];
+    ////////////// Traitement de texte //////////////
+    const getGroup = (text) => {
+      let group;
+      const i = text.indexOf('Groupe-');
+      if (i >= 0) {
+        group = text.charAt(i+7)
+        if (group == '0')
+          group = text.charAt(i+8)
+      }
+      return group;
+    }
+    const getSalle = (text) => text.substring(
+        text.indexOf('<br>ALB') + 7,
+        text.lastIndexOf('<br>')
+      ).replace(/ALB/g, '').trim();
+
+    ////////////// Jour et Horaire //////////////
+    const toHour = (width) => Math.round((width/73)*10)/10;
 
     // Tant que l'on a des matières à traiter
     while (element = document.getElementById('inner'+i)) {
       const text = element.innerHTML;
-      let groupe;
-      const groupIndex = text.indexOf('Groupe-');
-      if (groupIndex >= 0){
-        groupe = text.charAt(groupIndex+7)
-        if (groupe == '0') {
-          groupe = text.charAt(groupIndex+8)
-        }
-      }
+      const div = document.getElementById('div'+i);
+      const parent = div.parentElement;
 
-
-      const salle = text.substring(text.indexOf('<br>ALB') + 7, text.lastIndexOf('<br>'))
-        .replace(/ALB/g, '')
-        .trim();
-      // const salle = element.substring(index, element.lastIndexOf('<br>'));
       matieres.push({
+        //filiere,
         titre: element.firstChild.innerHTML,
-        salle,
-        groupe,
-        filiere,
-        // jour,
-        // horaire,
-        // duree,
-      })
-    // let prevParent;
-      // const parent = element.parentNode;
-      // // Si le parent n'est pas égale au précédent
-      // if (parent != prevParent) {
-      //   // console.log("parent", parent);
-      //   // console.log("prevParent", prevParent);
-      //   // C'est un nouveau jour
-      //
-      //   prevParent = parent;
-      // }
+        //salle: getSalle(text),
+        //groupe: getGroup(text),
+        duree: div.clientWidth,
+        horaire: parent.offsetLeft,
+        jour: parent.offsetTop,
+      });
 
       i++;
     }
