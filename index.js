@@ -43,6 +43,7 @@ function timeout(ms) {
     let i = 0;
     let element;
     const matieres = [];
+    const days = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'];
     const nbHour = (21.3-8);
     const {clientWidth: maxWidth, clientHeight: maxHeight} = document.getElementById('Planning');
     ////////////// Traitement de texte //////////////
@@ -62,10 +63,14 @@ function timeout(ms) {
       ).replace(/ALB/g, '').trim();
 
     ////////////// Jour et Horaire //////////////
+    const toDay = (height) => {
+      const i = Math.trunc(height * (days.length/maxHeight)+0.01);
+      return days[i];
+    }
     const toHour = (width, hourOffset=0) => {
       const h = width * (nbHour/maxWidth);
-      let hours = Math.trunc(h);
-      let m = (h-hours) * 100;
+      const hours = Math.trunc(h);
+      const m = (h-hours) * 100;
 
       let closestDif = m, minutes = 0;
       for (const norm of [25, 50, 75]) {
@@ -85,15 +90,14 @@ function timeout(ms) {
       const text = element.innerHTML;
       const div = document.getElementById('div'+i);
       const parent = div.parentElement;
-
       matieres.push({
-        //filiere,
+        filiere,
         titre: element.firstChild.innerHTML,
-        //salle: getSalle(text),
-        //groupe: getGroup(text),
+        salle: getSalle(text),
+        groupe: getGroup(text),
         duree: toHour(div.clientWidth),
         horaire: toHour(parent.offsetLeft, 8),
-        jour: parent.offsetTop,
+        jour: toDay(parent.offsetTop),
       });
 
       i++;
