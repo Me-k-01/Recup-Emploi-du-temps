@@ -1,4 +1,5 @@
 const puppeteer = require('puppeteer');
+const mysql = require('mysql');
 
 const url = 'https://adecampus.univ-jfc.fr/direct/index.jsp?data=02427bf08a4e3905df54e3828781966417a0456235d61df4705fb52a51c95d7ffb650adbf17b96d5d97cc32ac608bd13facd4837bfc6fce1bd5d96a07a04824c5823238300f7365f22d90e079254e14d6a818c4c1a069cb98a008d7020f28ba25b66babf80b753289969c1b1e23d701d8a96fc2bd08f9dcf79c796321f919fe8bce01058236ed18878168cf46b2a937d2d2d5b9bb5b4cfc3e41a0fb5035c09561ec7656b708e82cc6634e50913e2a166074e24568258ccc0a0cbc04889b0dae1,1';
 const sel = '#x-auto-99-input';
@@ -6,6 +7,7 @@ const sel = '#x-auto-99-input';
 function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
+const con = mysql.createConnection(require('creditential.json'));
 
 (async () => {
   ////////////// Démarage et recherche de l'url //////////////
@@ -21,17 +23,13 @@ function timeout(ms) {
   const page = await browser.newPage();
   await page.goto  (url);
   await page.screenshot({ path: 'screen.png' });
-  // var intervalID = setInterval(() => page.screenshot({ path: 'screen.png' }), 200);
 
   ////////////// Recherche de l'emploi du temps //////////////
-  // const frame = page.frames().find(frame => frame.url() === url);
   let input = await page.waitForSelector(sel);
   await timeout(100); // Sans ça ça marche une fois sur deux
 
-  await page.$eval(sel, input => input.setAttribute('value', '21L3-INF'))
-  // await input.type('21L3-INF'); // await page.keyboard.type('21L3-INF');
-  await input.press('Enter'); // await page.keyboard.press('Enter');
-
+  await page.$eval(sel, input => input.setAttribute('value', '21L3-INF')) // await input.type('21L3-INF');
+  await input.press('Enter');
   await page.screenshot({ path: 'screen.png' });
 
   await page.waitForSelector('#Planning');
@@ -105,6 +103,33 @@ function timeout(ms) {
     return matieres;
   }, '21L3-INF');
   console.log(matieres);
-  // clearInterval(intervalID);
+
+  con.connect(function(err) {
+    if (err) throw err;
+    ////////////// Effacement de toute les valeurs //////////////
+    con.query('TRUNCATE Schedule', function (err, res) {
+      if (err) throw err;
+      console.log('Données effacées');
+
+      // for (const m of matieres) {
+      //   let insertStr = '';
+      //   let valueStr = '';
+      //   const matArr = Object.entries(m);
+      //   for (var i = 0; i < matArr.length; i++) {
+      //     const [k, v] = matArr[i];
+      //     insertStr += k;
+      //     valueStr += v;
+      //     if (i != matArr.length-1) {
+      //       insertStr += ',';
+      //       valueStr += ',';
+      //     }
+      //   }
+      //   con.query(`INSERT INTO Schedule (${insertStr}) VALUES (${valueStr})`, function (err, res) {
+      //     if (err) throw err;
+      //   });
+      // }
+    });
+  });
+
   await browser.close();
 })();
