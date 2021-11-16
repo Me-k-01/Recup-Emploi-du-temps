@@ -9,7 +9,10 @@ function timeout(ms) {
 
 (async () => {
   ////////////// Démarage et recherche de l'url //////////////
-  const browser = await puppeteer.launch(); /*{
+  const browser = await puppeteer.launch({
+    args: [`--window-size=2000,1080`],
+    defaultViewport: null
+  }); /*{
       headless: false, // The browser is visible
       ignoreHTTPSErrors: true,
       args: [`--window-size=2000,1080`], // new option
@@ -40,7 +43,7 @@ function timeout(ms) {
     let i = 0;
     let element;
     const matieres = [];
-    const nbHour = (21.4-8);
+    const nbHour = (21.3-8);
     const {clientWidth: maxWidth, clientHeight: maxHeight} = document.getElementById('Planning');
     ////////////// Traitement de texte //////////////
     const getGroup = (text) => {
@@ -59,10 +62,21 @@ function timeout(ms) {
       ).replace(/ALB/g, '').trim();
 
     ////////////// Jour et Horaire //////////////
-    const hpw = (nbHour/maxWidth); // heure par taille * 10
-    const toHour = w => {
-      w = Math.round(w * hpw * 10);
-      return w / 10;
+    const toHour = width => {
+      const h = width * (nbHour/maxWidth);
+      let hours = Math.round(h);
+      let m = (h-hours) * 100;
+
+      let closestDif = m,
+        minutes = 0;
+      for (const norm of [25, 50, 75]) {
+        const dif = Math.abs(norm - m);
+        if (dif < closestDif) {
+          closestDif = dif;
+          minutes = norm * 0.6
+        }
+      }
+      return new //`${hours}:${minutes}:00`;
     };
 
     // Tant que l'on a des matières à traiter
