@@ -76,7 +76,7 @@ function timeout(ms) {
           minutes = norm * 0.6
         }
       }
-      return new //`${hours}:${minutes}:00`;
+      return new Date(0).setMinutes(minutes).setHours(hours)//`${hours}:${minutes}:00`;
     };
 
     // Tant que l'on a des matières à traiter
