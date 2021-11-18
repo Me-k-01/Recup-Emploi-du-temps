@@ -58,7 +58,7 @@ const con = mysql.createConnection(require('./creditential.json'));
     const getSalle = (text) => text.substring(
         text.indexOf('<br>ALB') + 7,
         text.lastIndexOf('<br>')
-      ).replace(/ALB/g, '').trim();
+      ).match(/[A-Z][A-Z][0-9][0-9][0-9]/g).join(' ');
 
     ////////////// Jour et Horaire //////////////
     const toDay = (height) => {
@@ -106,7 +106,7 @@ const con = mysql.createConnection(require('./creditential.json'));
 
   con.connect(function(err) {
     if (err) throw err;
-    console.log('Connecté a la base de données');
+    console.log('Connecté à la base de données');
     ////////////// Effacement de toute les valeurs //////////////
     con.query('TRUNCATE Schedule', function (err, res) {
       if (err) throw err;
@@ -115,7 +115,7 @@ const con = mysql.createConnection(require('./creditential.json'));
       var sql = "INSERT INTO Schedule (filiere, titre, jour, horaire, duree, salle, groupe) VALUES ?";
       con.query(sql, [matieres], function (err, res) {
         if (err) throw err;
-        console.log("Nombre de matieres inséré: " + res.affectedRows);
+        console.log("Nombre de matières insérées: " + res.affectedRows);
       });
     });
   });
