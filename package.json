@@ -12,5 +12,8 @@
   "dependencies": {
     "mysql": "^2.18.1",
     "puppeteer": "^5.5.0"
+  },
+  "devDependencies": {
+    "why-is-node-running": "^2.2.0"
   }
 }
